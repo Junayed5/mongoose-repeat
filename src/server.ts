@@ -8,7 +8,7 @@ const port = 5000;
 async function main() {
   try {
     await mongoose.connect(
-      "mongodb+srv://mongo-juna:mongodb@cluster0.8ujknfb.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+      "mongodb+srv://mongo-juna:mongodb@cluster0.8ujknfb.mongodb.net/start-new?retryWrites=true&w=majority&appName=Cluster0"
     );
     console.log("connected to mongoDB");
     server = app.listen(port, () => {
