@@ -5,30 +5,101 @@ const app: Application = express();
 app.use(express.json());
 
 const notesSchema = new Schema({
-    title: String,
-    content: String
-})
+  title: { type: String, require: true, trim: true },
+  content: { type: String, default: "" },
+  category: {
+    type: String,
+    enum: ["personal", "work", "study", "other"],
+    default: "personal",
+  },
+  pinned: { type: Boolean, default: false },
+  tags: {
+    label: { type: String, require: true },
+    color: { type: String, default: "gray" },
+  },
+});
 
 const Note = model("Note", notesSchema);
 
+app.get("/", (req: Request, res: Response) => {
+  res.send("This is my turning point");
+});
 
+app.get("/notes", async (req: Request, res: Response) => {
+  const notes = await Note.find();
 
-app.get('/', (req:Request,res:Response ) => {
-    res.send('This is my turning point')
-})
-app.post('/create-note', async(req:Request,res:Response ) => {
-    const newNote = new Note({
-        title: "Learning Mongoose",
-        content: "I am learning mongoose to update Myself"
-    });
+  res.status(201).json({
+    success: true,
+    message: "New note created successfully",
+    note: notes,
+  });
+});
 
-    await newNote.save()
+app.get("/notes/:noteId", async (req: Request, res: Response) => {
+  const noteId = req.params.noteId;
+  //   const note = await Note.findOne({_id : noteId});
+  const note = await Note.findById(noteId);
 
-    res.status(201).json({
-        success: true,
-        message : "New note created successfully",
-        note: newNote
-    })
-})
+  res.status(201).json({
+    success: true,
+    message: "New note created successfully",
+    note: note,
+  });
+});
 
-export default app; 
+app.post("/note/create-note", async (req: Request, res: Response) => {
+  // Approach-1
+  //   const newNote = new Note({
+  //     title: "Learning Mongoose",
+  //     tags: {
+  //         label: 'DATABASE'
+  //     }
+  //   });
+
+  //   await newNote.save();
+
+  // Approach - 2
+
+  const body = req.body;
+
+  const note = await Note.create(body);
+
+  res.status(201).json({
+    success: true,
+    message: "New note created successfully",
+    note: note,
+  });
+});
+
+app.patch("/notes/:noteId", async (req: Request, res: Response) => {
+  const noteId = req.params.noteId;
+  const body = req.body;
+  const note = await Note.findByIdAndUpdate(noteId, body,{new: true});
+  // // const note = await Note.updateOne({_id : noteId}, body, {new: true});
+  // const note = await Note.findOneAndUpdate({ _id: noteId }, body, {
+  //   new: true,
+  // });
+
+  res.status(201).json({
+    success: true,
+    message: "New note created successfully",
+    note: note,
+  });
+});
+app.patch("/notes/:noteId", async (req: Request, res: Response) => {
+  const noteId = req.params.noteId;
+  const body = req.body;
+  const note = await Note.findByIdAndUpdate(noteId, body,{new: true});
+  // // const note = await Note.updateOne({_id : noteId}, body, {new: true});
+  // const note = await Note.findOneAndUpdate({ _id: noteId }, body, {
+  //   new: true,
+  // });
+
+  res.status(201).json({
+    success: true,
+    message: "New note created successfully",
+    note: note,
+  });
+});
+
+export default app;
